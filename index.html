@@ -8,12 +8,12 @@
     :root {
       --text: #102033;
       --muted: #32465f;
-      --yellow: rgba(255, 191, 0, 0.85);
+      --yellow: rgba(234, 221, 165, 0.9);
       --green: rgba(199, 249, 204, 0.84);
       --red: rgba(248, 180, 180, 0.84);
       --bright-green: rgba(134, 239, 172, 0.92);
       --bright-red: rgba(248, 113, 113, 0.92);
-      --orange: rgba(255, 179, 71, 0.9);
+      --orange: rgba(255, 234, 0, 0.95);
       --blue: rgba(219, 234, 254, 0.9);
       --header-accent: #c62828;
       --shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
@@ -25,6 +25,7 @@
       margin: 0;
       font-family: Arial, Helvetica, sans-serif;
       background-image: url("BlueRidgeMTNs.jpg");
+      background-repeat: no-repeat;
       background-size: cover;
       background-position: center;
       background-attachment: fixed;
@@ -36,8 +37,10 @@
       content: "";
       position: fixed;
       inset: 0;
-      background: rgba(255, 255, 255, 0.36);
+      /* lighter overlay so the Blue Ridge image appears as a watermark */
+      background: rgba(255, 255, 255, 0.18);
       z-index: -1;
+      pointer-events: none;
     }
 
     .wrap {
@@ -1212,5 +1215,7 @@
   </script>
 </body>
 </html>
+
+
 
 
