@@ -8,7 +8,7 @@
     :root {
       --text: #102033;
       --muted: #32465f;
-      --yellow: rgba(255, 243, 176, 0.78);
+      --yellow: rgba(255, 191, 0, 0.85);
       --green: rgba(199, 249, 204, 0.84);
       --red: rgba(248, 180, 180, 0.84);
       --bright-green: rgba(134, 239, 172, 0.92);
@@ -195,21 +195,33 @@
     button.secondary { background: rgba(75, 85, 99, 0.88); }
 
     .table-wrap {
-      overflow-x: auto;
+      overflow: hidden;
       background: transparent;
+      width: 100%;
+    }
+
+    .table-scale-wrap {
+      width: 100%;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .table-scale-inner {
+      transform-origin: top left;
+      will-change: transform;
     }
 
     table {
       width: 100%;
       border-collapse: separate;
       border-spacing: 0;
-      min-width: 2700px;
+      min-width: 2400px;
       table-layout: auto;
     }
 
     th, td {
       border: 1px solid rgba(255,255,255,0.2);
-      padding: 12px;
+      padding: 8px;
       text-align: center;
       vertical-align: middle;
     }
@@ -217,7 +229,7 @@
     th {
       background: rgba(18, 58, 99, 0.78);
       color: white;
-      font-size: 13px;
+      font-size: 11px;
       line-height: 1.3;
       position: sticky;
       top: 0;
@@ -276,7 +288,7 @@
     .notes-input,
     .type-select {
       width: 100%;
-      padding: 8px 10px;
+      padding: 6px 8px;
       border: 1px solid rgba(255,255,255,0.35);
       border-radius: 10px;
       font-size: 13px;
@@ -312,9 +324,9 @@
       display: inline-flex;
       align-items: center;
       gap: 4px;
-      font-size: 13px;
+      font-size: 11px;
       font-weight: 700;
-      padding: 6px 8px;
+      padding: 4px 6px;
       border-radius: 10px;
       background: var(--yellow);
       min-width: 58px;
@@ -496,7 +508,9 @@
       </div>
 
       <div class="table-wrap">
-        <table id="projectTable">
+        <div class="table-scale-wrap" id="tableScaleWrap">
+          <div class="table-scale-inner" id="tableScaleInner">
+            <table id="projectTable">
           <thead>
             <tr>
               <th class="project-name" data-sort="text">Project Name</th>
@@ -523,6 +537,8 @@
           </thead>
           <tbody id="projectTableBody"></tbody>
         </table>
+          </div>
+        </div>
       </div>
 
       <div class="legend">
@@ -547,6 +563,9 @@
     const showIncompleteBtn = document.getElementById('showIncompleteBtn');
     const exportCsvBtn = document.getElementById('exportCsvBtn');
     const projectTableBody = document.getElementById('projectTableBody');
+    const projectTable = document.getElementById('projectTable');
+    const tableScaleWrap = document.getElementById('tableScaleWrap');
+    const tableScaleInner = document.getElementById('tableScaleInner');
     const tableHeaders = document.querySelectorAll('#projectTable thead th[data-sort]');
 
     let rowCount = 0;
@@ -985,6 +1004,7 @@
 
     function persistRows() {
       localStorage.setItem(storageKey, JSON.stringify(collectRows()));
+      queueTableScale();
     }
 
     function loadRows() {
@@ -1015,6 +1035,30 @@
         const status = row.querySelector('.status-pill')?.textContent || '';
         const show = currentFilter === 'all' || status === '⚠️ ⚠️';
         row.style.display = show ? '' : 'none';
+      });
+      queueTableScale();
+    }
+
+    function updateTableScale() {
+      if (!projectTable || !tableScaleWrap || !tableScaleInner) return;
+      tableScaleInner.style.transform = 'scale(1)';
+      tableScaleWrap.style.height = 'auto';
+      const naturalWidth = projectTable.scrollWidth;
+      const naturalHeight = projectTable.scrollHeight;
+      const availableWidth = tableScaleWrap.clientWidth;
+      if (!naturalWidth || !availableWidth) return;
+      const scale = Math.min(1, availableWidth / naturalWidth);
+      tableScaleInner.style.transform = `scale(${scale})`;
+      tableScaleWrap.style.height = `${naturalHeight * scale}px`;
+    }
+
+    let tableScaleQueued = false;
+    function queueTableScale() {
+      if (tableScaleQueued) return;
+      tableScaleQueued = true;
+      requestAnimationFrame(() => {
+        tableScaleQueued = false;
+        updateTableScale();
       });
     }
 
@@ -1160,7 +1204,13 @@
       header.addEventListener('click', () => sortTableByColumn(index, header.dataset.sort));
     });
 
-    window.addEventListener('load', loadRows);
+    window.addEventListener('load', () => {
+      loadRows();
+      queueTableScale();
+    });
+    window.addEventListener('resize', queueTableScale);
   </script>
 </body>
 </html>
+
+
