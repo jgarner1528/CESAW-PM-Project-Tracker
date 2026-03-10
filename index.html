@@ -8,13 +8,14 @@
     :root {
       --text: #102033;
       --muted: #32465f;
-      --yellow: rgba(234, 221, 165, 0.9);
-      --aging-yellow: #FFFF00;
+      --yellow: rgba(234, 221, 165, 0.9); /* tan default incomplete color */
+      --aging-yellow: #FFFF00; /* bright caution yellow for aging warning */
       --green: rgba(199, 249, 204, 0.84);
       --red: rgba(248, 180, 180, 0.84);
+      --aging-yellow: #FFFF00; /* bright aging warning yellow */
       --bright-green: rgba(134, 239, 172, 0.92);
       --bright-red: rgba(248, 113, 113, 0.92);
-      --orange: #FF8C00;
+      --orange: #FF8C00; /* true orange for mixed but complete rows */
       --blue: rgba(219, 234, 254, 0.9);
       --header-accent: #c62828;
       --shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
@@ -26,10 +27,10 @@
       margin: 0;
       font-family: Arial, Helvetica, sans-serif;
       background-image: url("BlueRidgeMTNs.jpg");
+      background-repeat: no-repeat;
       background-size: cover;
       background-position: center;
       background-attachment: fixed;
-      background-repeat: no-repeat;
       color: var(--text);
       padding: 24px;
     }
@@ -38,6 +39,7 @@
       content: "";
       position: fixed;
       inset: 0;
+      /* lighter overlay so the Blue Ridge image appears as a watermark */
       background: rgba(255, 255, 255, 0.18);
       z-index: -1;
       pointer-events: none;
@@ -105,7 +107,7 @@
       margin: 0 0 16px;
       color: #13263f;
       line-height: 1.55;
-      font-size: 15px;
+      font-size: 17px;
       text-shadow: 0 1px 1px rgba(255,255,255,0.15);
     }
 
@@ -146,7 +148,7 @@
       border-radius: 12px;
       padding: 10px 12px;
       box-shadow: 0 5px 14px rgba(0,0,0,0.08);
-      font-size: 13px;
+      font-size: 17px;
       line-height: 1.4;
     }
 
@@ -178,13 +180,13 @@
     }
 
     button {
-      padding: 12px 16px;
+      padding: 13px 17px;
       border: 1px solid rgba(255,255,255,0.22);
       border-radius: 12px;
       background: rgba(17, 24, 39, 0.88);
       color: white;
       cursor: pointer;
-      font-size: 14px;
+      font-size: 16px;
       font-weight: 600;
       box-shadow: 0 8px 18px rgba(0,0,0,0.18);
       transition: transform 0.15s ease, background 0.15s ease;
@@ -218,13 +220,13 @@
       width: 100%;
       border-collapse: separate;
       border-spacing: 0;
-      min-width: 2400px;
+      min-width: 2200px;
       table-layout: auto;
     }
 
     th, td {
       border: 1px solid rgba(255,255,255,0.2);
-      padding: 8px;
+      padding: 10px;
       text-align: center;
       vertical-align: middle;
     }
@@ -232,7 +234,7 @@
     th {
       background: rgba(18, 58, 99, 0.78);
       color: white;
-      font-size: 11px;
+      font-size: 17px;
       line-height: 1.3;
       position: sticky;
       top: 0;
@@ -253,9 +255,16 @@
     }
 
     th.project-name, td.project-name {
-      text-align: left;
       min-width: 250px;
       font-weight: 700;
+    }
+
+    th.project-name {
+      text-align: center;
+    }
+
+    td.project-name {
+      text-align: left;
     }
 
     th:nth-child(2), td:nth-child(2) { min-width: 132px; }
@@ -264,9 +273,8 @@
     th:nth-child(5), td:nth-child(5) { min-width: 148px; }
     th:nth-child(6), td:nth-child(6) { min-width: 152px; }
     th:nth-child(16), td:nth-child(16) { min-width: 110px; max-width: 120px; }
-    th:nth-child(17), td:nth-child(17) { min-width: 250px; }
-    th:nth-child(18), td:nth-child(18) { min-width: 110px; }
-    th:nth-child(19), td:nth-child(19), th:nth-child(20), td:nth-child(20) { min-width: 95px; }
+    th:nth-child(17), td:nth-child(17) { min-width: 110px; }
+    th:nth-child(18), td:nth-child(18), th:nth-child(19), td:nth-child(19) { min-width: 95px; }
 
     tr.status-yellow td {
       background: var(--yellow);
@@ -292,10 +300,10 @@
     .notes-input,
     .type-select {
       width: 100%;
-      padding: 6px 8px;
+      padding: 10px 12px;
       border: 1px solid rgba(255,255,255,0.35);
       border-radius: 10px;
-      font-size: 13px;
+      font-size: 17px;
       background: rgba(255,255,255,0.78);
       box-shadow: 0 6px 18px rgba(0,0,0,0.08);
     }
@@ -327,10 +335,10 @@
     .option-group label {
       display: inline-flex;
       align-items: center;
-      gap: 4px;
-      font-size: 11px;
+      gap: 5px;
+      font-size: 17px;
       font-weight: 700;
-      padding: 4px 6px;
+      padding: 6px 8px;
       border-radius: 10px;
       background: var(--yellow);
       min-width: 58px;
@@ -350,13 +358,8 @@
     .option-group label.option-yes.selected,
     .option-group label.option-gc.selected,
     .option-group label.option-ic.selected,
-    .option-group label.option-na.selected {
-      background: var(--green);
-    }
-
-    .option-group label.option-no.selected {
-      background: var(--red);
-    }
+    .option-group label.option-na.selected { background: var(--green); }
+    .option-group label.option-no.selected { background: var(--red); }
 
     .aging-pill,
     .target-pill,
@@ -364,10 +367,10 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      min-width: 96px;
-      padding: 6px 10px;
+      min-width: 108px;
+      padding: 8px 12px;
       border-radius: 999px;
-      font-size: 12px;
+      font-size: 14px;
       font-weight: 800;
       line-height: 1.15;
       text-align: center;
@@ -385,7 +388,7 @@
 
     .target-pill { background: rgba(255,255,255,0.74); color: #102033; }
     .target-good { background: rgba(134, 239, 172, 0.9); }
-    .target-watch { background: var(--aging-yellow); }
+    .target-watch { background: rgba(255, 243, 176, 0.9); }
     .target-overdue { background: rgba(248, 113, 113, 0.9); color: white; }
 
     .progress-wrap {
@@ -395,7 +398,7 @@
 
     .progress-track {
       width: 100%;
-      height: 14px;
+      height: 26px;
       border-radius: 999px;
       background: rgba(255,255,255,0.55);
       overflow: hidden;
@@ -410,8 +413,8 @@
     }
 
     .progress-label {
-      margin-top: 4px;
-      font-size: 12px;
+      margin-top: 5px;
+      font-size: 14px;
       font-weight: 700;
       color: #13263f;
       text-align: center;
@@ -447,8 +450,8 @@
     .legend-item {
       display: flex;
       align-items: center;
-      gap: 8px;
-      font-size: 13px;
+      gap: 9px;
+      font-size: 17px;
       color: #13263f;
       font-weight: 600;
       background: rgba(255,255,255,0.36);
@@ -460,8 +463,8 @@
     }
 
     .swatch {
-      width: 18px;
-      height: 18px;
+      width: 26px;
+      height: 22px;
       border-radius: 4px;
       border: 1px solid rgba(0,0,0,0.1);
       flex: 0 0 auto;
@@ -508,11 +511,11 @@
             <div class="timeline-chip"><strong>IP, Individual Permit</strong> Common tracking goal is about 120 days once the application is complete and the review process is underway.</div>
             <div class="timeline-chip"><strong>SIP, Standard Individual Permit</strong> Similar to IP, commonly tracked at about 120 days for workload management.</div>
             <div class="timeline-chip"><strong>Permit Mod, Permit Modification</strong> Often tracked around 45 days, but can vary with the scope of the requested change.</div>
-            <div class="timeline-chip"><strong>DC, Delineation Concurrence</strong> Often same day to ~30 days depending on submittal quality and review needs.</div>
+            <div class="timeline-chip"><strong>DC, Delineation Concurrence</strong> Common tracking window is same day to about 30 days, depending on submittal quality and review needs.</div>
             <div class="timeline-chip"><strong>AJD, Approved Jurisdictional Determination</strong> Common Wilmington-style tracking goal is about 60 days.</div>
-            <div class="timeline-chip"><strong>PJD, Preliminary Jurisdictional Determination</strong> Often same day to ~30 days if the request package is sufficient.</div>
+            <div class="timeline-chip"><strong>PJD, Preliminary Jurisdictional Determination</strong> Often same day to about 30 days if the request package is sufficient.</div>
             <div class="timeline-chip"><strong>PREAPPCONS, Pre-Application Consultation</strong> Common planning and coordination target is about 30 days.</div>
-            <div class="timeline-chip"><strong>NPR, No Permit Required</strong> Often same day to ~30 days depending on jurisdictional review and project information.</div>
+            <div class="timeline-chip"><strong>NPR, Notice / Public Review</strong> Public notice comment windows are typically tracked at 30 days.</div>
             <div class="timeline-chip"><strong>PGP, Programmatic General Permit</strong> Common tracker value is about 45 days, though actual timing depends on the partner program and completeness.</div>
             <div class="timeline-chip"><strong>RGP, Regional General Permit</strong> Common tracker value is about 60 days, used as an expedited regional general permit review benchmark.</div>
             <div class="timeline-chip"><strong>LOP, Letter of Permission</strong> Common abbreviated review track is about 60 to 90 days, this tracker uses 90 days.</div>
@@ -533,32 +536,32 @@
         <div class="table-scale-wrap" id="tableScaleWrap">
           <div class="table-scale-inner" id="tableScaleInner">
             <table id="projectTable">
-              <thead>
-                <tr>
-                  <th class="project-name" data-sort="text">Project Name</th>
-                  <th data-sort="date">Start Date</th>
-                  <th data-sort="aging">Days in Review</th>
-                  <th data-sort="date">Target Date</th>
-                  <th data-sort="progress">Progress</th>
-                  <th data-sort="type">Project Type</th>
-                  <th data-sort="yn">Administrative Record Initiated</th>
-                  <th data-sort="yn">ORM Action Initiated</th>
-                  <th data-sort="yn">Completeness Determination</th>
-                  <th data-sort="yn">Evaluation Checklist</th>
-                  <th data-sort="yn">Trout Waters / NC HQW</th>
-                  <th data-sort="yn">401 WQC</th>
-                  <th>401 WQC Type</th>
-                  <th data-sort="yn">Section 7 ESA</th>
-                  <th data-sort="yn">Section 106 NHPA</th>
-                  <th data-sort="yn">THPO / Tribal</th>
-                  <th data-sort="text">Notes</th>
-                  <th data-sort="status">Status</th>
-                  <th>Reset</th>
-                  <th>Delete</th>
-                </tr>
-              </thead>
-              <tbody id="projectTableBody"></tbody>
-            </table>
+          <thead>
+            <tr>
+              <th class="project-name" data-sort="text">Project Name</th>
+              <th data-sort="date">Start Date</th>
+              <th data-sort="aging">Days in Review</th>
+              <th data-sort="date">Target Date</th>
+              <th data-sort="progress">Progress</th>
+              <th data-sort="type">Project Type</th>
+              <th data-sort="yn">Administrative Record Initiated</th>
+              <th data-sort="yn">ORM Action Initiated</th>
+              <th data-sort="yn">Completeness Determination</th>
+              <th data-sort="yn">Evaluation Checklist</th>
+              <th data-sort="yn">Trout Waters / NC HQW</th>
+              <th data-sort="yn">401 WQC</th>
+              <th>401 WQC Type</th>
+              <th data-sort="yn">Section 7 ESA</th>
+              <th data-sort="yn">Section 106 NHPA</th>
+              <th data-sort="yn">THPO / Tribal</th>
+              <th data-sort="text">Notes</th>
+              <th data-sort="status">Status</th>
+              <th>Reset</th>
+              <th>Delete</th>
+            </tr>
+          </thead>
+          <tbody id="projectTableBody"></tbody>
+        </table>
           </div>
         </div>
       </div>
@@ -575,7 +578,7 @@
         <div style="display:flex;flex-wrap:wrap;gap:10px;">
           <div class="legend-item"><span class="swatch yellow"></span> Yellow row = ⚠️ ⚠️ incomplete</div>
           <div class="legend-item"><span class="swatch bright-green"></span> Bright green row = 👍 💯 all yes</div>
-          <div class="legend-item"><span class="swatch orange"></span> Orange row = 👍 💯 mixed but complete</div>
+          <div class="legend-item"><span class="swatch" style="background: var(--orange);"></span> Orange row = 👍 💯 mixed but complete</div>
           <div class="legend-item"><span class="swatch bright-red"></span> Bright red row = 👎 🛑 all no</div>
         </div>
       </div>
@@ -600,8 +603,8 @@
     let rowCount = 0;
     const reviewColumnCount = 9;
     const totalTrackedSelections = 10;
-    const storageKey = 'usace_project_tracker_rows_v4';
-    const projectTypeOptions = ['PCN', 'NWP', 'UA', 'IP', 'SIP', 'Permit Mod', 'DC', 'AJD', 'PJD', 'PREAPPCONS', 'NPR', 'PGP', 'RGP', 'LOP'];
+    const storageKey = 'usace_project_tracker_rows_v3';
+    const projectTypeOptions = ['PCN', 'NWP', 'UA', 'IP', 'SIP', 'Permit Mod', 'DC', 'AJD', 'PJD', 'PREAPPCONS'];
     let currentFilter = 'all';
     let sortDirection = {};
 
@@ -657,7 +660,7 @@
     function createWqcTypeCell(rowId, presetValue = '') {
       const td = document.createElement('td');
       td.innerHTML = `
-        <div class="option-group vertical">
+        <div class="option-group">
           <label class="option-gc ${presetValue === 'GC' ? 'selected' : ''}">
             <input type="radio" name="${rowId}-wqctype" value="GC" ${presetValue === 'GC' ? 'checked' : ''}/> G.C.
           </label>
@@ -685,6 +688,8 @@
             notesInput.value = 'Individual 401 WQC authorized for project.';
           } else if (event.target.value === 'NA') {
             notesInput.value = '401 WQC not applicable for this project or ORM action type.';
+          } else if (event.target.value === 'IC') {
+            notesInput.value = 'Individual 401 WQC authorized for project.';
           }
 
           updateRowStatus(rowId);
@@ -710,10 +715,6 @@
 
     function getProjectTypeValue(rowId) {
       return document.getElementById(rowId)?.querySelector('.type-select')?.value || '';
-    }
-
-    function getWqcTypeValue(rowId) {
-      return document.querySelector(`input[name="${rowId}-wqctype"]:checked`)?.value || '';
     }
 
     function calculateDaysInReview(dateString) {
@@ -748,6 +749,10 @@
       const now = new Date();
       now.setHours(0, 0, 0, 0);
       return Math.floor((target.getTime() - now.getTime()) / 86400000);
+    }
+
+    function getWqcTypeValue(rowId) {
+      return document.querySelector(`input[name="${rowId}-wqctype"]:checked`)?.value || '';
     }
 
     function getAnsweredCount(rowId) {
@@ -991,7 +996,7 @@
       row.querySelectorAll(`input[name="${rowId}-wqctype"]`).forEach(input => {
         input.checked = false;
       });
-      row.querySelectorAll('.option-gc, .option-ic, .option-na').forEach(label => label.classList.remove('selected'));
+      row.querySelectorAll('.option-gc, .option-ic').forEach(label => label.classList.remove('selected'));
 
       const typeSelect = row.querySelector('.type-select');
       if (typeSelect) {
@@ -1109,7 +1114,7 @@
         const allAnswered = row.reviewValues.every(v => v !== null);
         const allYes = row.reviewValues.length > 0 && row.reviewValues.every(v => v === 'yes');
         const allNo = row.reviewValues.length > 0 && row.reviewValues.every(v => v === 'no');
-        const complete = row.projectName && row.projectType && row.wqcType && allAnswered;
+        const complete = row.projectName && row.projectType && allAnswered;
         let status = '⚠️ ⚠️';
         if (allYes) status = '👍 💯';
         else if (allNo) status = '👎 🛑';
@@ -1243,5 +1248,7 @@
   </script>
 </body>
 </html>
+
+
 
 
