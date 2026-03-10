@@ -9,12 +9,12 @@
       --text: #102033;
       --muted: #32465f;
       --yellow: rgba(234, 221, 165, 0.9);
+      --aging-yellow: #FFFF00;
       --green: rgba(199, 249, 204, 0.84);
       --red: rgba(248, 180, 180, 0.84);
-      --aging-yellow: #FFFF00; /* bright aging warning yellow */
       --bright-green: rgba(134, 239, 172, 0.92);
       --bright-red: rgba(248, 113, 113, 0.92);
-      --orange: #FF8C00; /* true orange for mixed but complete rows */
+      --orange: #FF8C00;
       --blue: rgba(219, 234, 254, 0.9);
       --header-accent: #c62828;
       --shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
@@ -26,10 +26,10 @@
       margin: 0;
       font-family: Arial, Helvetica, sans-serif;
       background-image: url("BlueRidgeMTNs.jpg");
-      background-repeat: no-repeat;
       background-size: cover;
       background-position: center;
       background-attachment: fixed;
+      background-repeat: no-repeat;
       color: var(--text);
       padding: 24px;
     }
@@ -38,7 +38,6 @@
       content: "";
       position: fixed;
       inset: 0;
-      /* lighter overlay so the Blue Ridge image appears as a watermark */
       background: rgba(255, 255, 255, 0.18);
       z-index: -1;
       pointer-events: none;
@@ -265,8 +264,9 @@
     th:nth-child(5), td:nth-child(5) { min-width: 148px; }
     th:nth-child(6), td:nth-child(6) { min-width: 152px; }
     th:nth-child(16), td:nth-child(16) { min-width: 110px; max-width: 120px; }
-    th:nth-child(17), td:nth-child(17) { min-width: 110px; }
-    th:nth-child(18), td:nth-child(18), th:nth-child(19), td:nth-child(19) { min-width: 95px; }
+    th:nth-child(17), td:nth-child(17) { min-width: 250px; }
+    th:nth-child(18), td:nth-child(18) { min-width: 110px; }
+    th:nth-child(19), td:nth-child(19), th:nth-child(20), td:nth-child(20) { min-width: 95px; }
 
     tr.status-yellow td {
       background: var(--yellow);
@@ -350,8 +350,13 @@
     .option-group label.option-yes.selected,
     .option-group label.option-gc.selected,
     .option-group label.option-ic.selected,
-    .option-group label.option-na.selected { background: var(--green); }
-    .option-group label.option-no.selected { background: var(--red); }
+    .option-group label.option-na.selected {
+      background: var(--green);
+    }
+
+    .option-group label.option-no.selected {
+      background: var(--red);
+    }
 
     .aging-pill,
     .target-pill,
@@ -375,12 +380,12 @@
     }
 
     .aging-fresh { background: rgba(134, 239, 172, 0.9); }
-    .aging-watch { background: rgba(255, 243, 176, 0.9); }
+    .aging-watch { background: var(--aging-yellow); }
     .aging-old { background: rgba(248, 113, 113, 0.9); color: white; }
 
     .target-pill { background: rgba(255,255,255,0.74); color: #102033; }
     .target-good { background: rgba(134, 239, 172, 0.9); }
-    .target-watch { background: rgba(255, 243, 176, 0.9); }
+    .target-watch { background: var(--aging-yellow); }
     .target-overdue { background: rgba(248, 113, 113, 0.9); color: white; }
 
     .progress-wrap {
@@ -428,8 +433,15 @@
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
-      margin-top: 16px;
+      margin-top: 20px;
       margin-bottom: 12px;
+      padding: 16px 18px;
+      border-top: 2px solid rgba(255,255,255,0.35);
+      border-radius: 18px;
+      background: rgba(255,255,255,0.18);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.10);
     }
 
     .legend-item {
@@ -456,6 +468,7 @@
     }
 
     .yellow { background: var(--yellow); }
+    .aging-yellow { background: var(--aging-yellow); }
     .green { background: var(--green); }
     .red { background: var(--red); }
     .bright-green { background: var(--bright-green); }
@@ -489,15 +502,20 @@
         <summary>Show typical regulatory timelines reference</summary>
         <div class="timeline-inner">
           <div class="timeline-grid">
-            <div class="timeline-chip"><strong>AJD</strong> ~60 day goal</div>
-            <div class="timeline-chip"><strong>PJD</strong> Often same day to ~30 days</div>
-            <div class="timeline-chip"><strong>NWP without PCN</strong> Immediate once criteria are met</div>
-            <div class="timeline-chip"><strong>NWP with PCN</strong> 45 days</div>
-            <div class="timeline-chip"><strong>NWP with ESA/106</strong> Variable, often 60 to 120+ days</div>
-            <div class="timeline-chip"><strong>LOP / Minor action</strong> ~60 to 90 days</div>
-            <div class="timeline-chip"><strong>IP / SIP</strong> ~120 day goal</div>
-            <div class="timeline-chip"><strong>Public Notice period</strong> 15 to 30 days</div>
-            <div class="timeline-chip"><strong>After-the-fact</strong> Depends on enforcement path</div>
+            <div class="timeline-chip"><strong>PCN, Pre-Construction Notification</strong> 45 day Corps review window after receipt of a complete PCN.</div>
+            <div class="timeline-chip"><strong>NWP, Nationwide Permit</strong> Often immediate if no PCN is required, 45 days when a PCN is required.</div>
+            <div class="timeline-chip"><strong>UA, Unauthorized Action</strong> No single definitive timeline, depends on enforcement posture, restoration needs, and submittal completeness.</div>
+            <div class="timeline-chip"><strong>IP, Individual Permit</strong> Common tracking goal is about 120 days once the application is complete and the review process is underway.</div>
+            <div class="timeline-chip"><strong>SIP, Standard Individual Permit</strong> Similar to IP, commonly tracked at about 120 days for workload management.</div>
+            <div class="timeline-chip"><strong>Permit Mod, Permit Modification</strong> Often tracked around 45 days, but can vary with the scope of the requested change.</div>
+            <div class="timeline-chip"><strong>DC, Delineation Concurrence</strong> Often same day to ~30 days depending on submittal quality and review needs.</div>
+            <div class="timeline-chip"><strong>AJD, Approved Jurisdictional Determination</strong> Common Wilmington-style tracking goal is about 60 days.</div>
+            <div class="timeline-chip"><strong>PJD, Preliminary Jurisdictional Determination</strong> Often same day to ~30 days if the request package is sufficient.</div>
+            <div class="timeline-chip"><strong>PREAPPCONS, Pre-Application Consultation</strong> Common planning and coordination target is about 30 days.</div>
+            <div class="timeline-chip"><strong>NPR, No Permit Required</strong> Often same day to ~30 days depending on jurisdictional review and project information.</div>
+            <div class="timeline-chip"><strong>PGP, Programmatic General Permit</strong> Common tracker value is about 45 days, though actual timing depends on the partner program and completeness.</div>
+            <div class="timeline-chip"><strong>RGP, Regional General Permit</strong> Common tracker value is about 60 days, used as an expedited regional general permit review benchmark.</div>
+            <div class="timeline-chip"><strong>LOP, Letter of Permission</strong> Common abbreviated review track is about 60 to 90 days, this tracker uses 90 days.</div>
           </div>
         </div>
       </details>
@@ -515,44 +533,51 @@
         <div class="table-scale-wrap" id="tableScaleWrap">
           <div class="table-scale-inner" id="tableScaleInner">
             <table id="projectTable">
-          <thead>
-            <tr>
-              <th class="project-name" data-sort="text">Project Name</th>
-              <th data-sort="date">Start Date</th>
-              <th data-sort="aging">Days in Review</th>
-              <th data-sort="date">Target Date</th>
-              <th data-sort="progress">Progress</th>
-              <th data-sort="type">Project Type</th>
-              <th data-sort="yn">Administrative Record Initiated</th>
-              <th data-sort="yn">ORM Action Initiated</th>
-              <th data-sort="yn">Completeness Determination</th>
-              <th data-sort="yn">Evaluation Checklist</th>
-              <th data-sort="yn">Trout Waters / NC HQW</th>
-              <th data-sort="yn">401 WQC</th>
-              <th>401 WQC Type</th>
-              <th data-sort="yn">Section 7 ESA</th>
-              <th data-sort="yn">Section 106 NHPA</th>
-              <th data-sort="yn">THPO / Tribal</th>
-              <th data-sort="text">Notes</th>
-              <th data-sort="status">Status</th>
-              <th>Reset</th>
-              <th>Delete</th>
-            </tr>
-          </thead>
-          <tbody id="projectTableBody"></tbody>
-        </table>
+              <thead>
+                <tr>
+                  <th class="project-name" data-sort="text">Project Name</th>
+                  <th data-sort="date">Start Date</th>
+                  <th data-sort="aging">Days in Review</th>
+                  <th data-sort="date">Target Date</th>
+                  <th data-sort="progress">Progress</th>
+                  <th data-sort="type">Project Type</th>
+                  <th data-sort="yn">Administrative Record Initiated</th>
+                  <th data-sort="yn">ORM Action Initiated</th>
+                  <th data-sort="yn">Completeness Determination</th>
+                  <th data-sort="yn">Evaluation Checklist</th>
+                  <th data-sort="yn">Trout Waters / NC HQW</th>
+                  <th data-sort="yn">401 WQC</th>
+                  <th>401 WQC Type</th>
+                  <th data-sort="yn">Section 7 ESA</th>
+                  <th data-sort="yn">Section 106 NHPA</th>
+                  <th data-sort="yn">THPO / Tribal</th>
+                  <th data-sort="text">Notes</th>
+                  <th data-sort="status">Status</th>
+                  <th>Reset</th>
+                  <th>Delete</th>
+                </tr>
+              </thead>
+              <tbody id="projectTableBody"></tbody>
+            </table>
           </div>
         </div>
       </div>
 
-      <div class="legend">
-        <div class="legend-item"><span class="swatch yellow"></span> Yellow row = ⚠️ ⚠️ incomplete</div>
-        <div class="legend-item"><span class="swatch orange"></span> Orange row = 👍 💯 mixed but complete</div>
-        <div class="legend-item"><span class="swatch bright-green"></span> Bright green row = 👍 💯 all yes</div>
-        <div class="legend-item"><span class="swatch bright-red"></span> Bright red row = 👎 🛑 all no</div>
-        <div class="legend-item"><span class="swatch green"></span> Aging green = under threshold</div>
-        <div class="legend-item"><span class="swatch yellow"></span> Aging yellow = approaching threshold</div>
-        <div class="legend-item"><span class="swatch red"></span> Aging red = overdue</div>
+      <div class="legend" style="flex-direction:column;align-items:flex-start;gap:14px;">
+        <div style="font-weight:700;font-size:15px;margin-bottom:2px;">Project Time Clock Colors</div>
+        <div style="display:flex;flex-wrap:wrap;gap:10px;">
+          <div class="legend-item"><span class="swatch green"></span> Aging green = under threshold</div>
+          <div class="legend-item"><span class="swatch aging-yellow"></span> Aging yellow = approaching threshold</div>
+          <div class="legend-item"><span class="swatch bright-red"></span> Aging red = overdue</div>
+        </div>
+
+        <div style="font-weight:700;font-size:15px;margin-top:6px;">Project Row Identifying Colors</div>
+        <div style="display:flex;flex-wrap:wrap;gap:10px;">
+          <div class="legend-item"><span class="swatch yellow"></span> Yellow row = ⚠️ ⚠️ incomplete</div>
+          <div class="legend-item"><span class="swatch bright-green"></span> Bright green row = 👍 💯 all yes</div>
+          <div class="legend-item"><span class="swatch orange"></span> Orange row = 👍 💯 mixed but complete</div>
+          <div class="legend-item"><span class="swatch bright-red"></span> Bright red row = 👎 🛑 all no</div>
+        </div>
       </div>
 
       <div class="empty-note">Place <strong>WDlogo.png</strong> and <strong>BlueRidgeMTNs.jpg</strong> in the same folder as this HTML file. This tracker auto-saves in your browser, supports sorting by clicking column headers, can filter incomplete rows, and exports to CSV.</div>
@@ -575,22 +600,26 @@
     let rowCount = 0;
     const reviewColumnCount = 9;
     const totalTrackedSelections = 10;
-    const storageKey = 'usace_project_tracker_rows_v3';
-    const projectTypeOptions = ['PCN', 'NWP', 'UA', 'IP', 'SIP', 'Permit Mod', 'DC', 'AJD', 'PJD', 'PREAPPCONS'];
+    const storageKey = 'usace_project_tracker_rows_v4';
+    const projectTypeOptions = ['PCN', 'NWP', 'UA', 'IP', 'SIP', 'Permit Mod', 'DC', 'AJD', 'PJD', 'PREAPPCONS', 'NPR', 'PGP', 'RGP', 'LOP'];
     let currentFilter = 'all';
     let sortDirection = {};
 
     const timelineRules = {
       'PCN': 45,
       'NWP': 45,
-      'UA': 45,
+      'UA': null,
       'IP': 120,
       'SIP': 120,
       'Permit Mod': 45,
-      'DC': 45,
+      'DC': 30,
       'AJD': 60,
       'PJD': 30,
-      'PREAPPCONS': 30
+      'PREAPPCONS': 30,
+      'NPR': 30,
+      'PGP': 45,
+      'RGP': 60,
+      'LOP': 90
     };
 
     function escapeHtml(value) {
@@ -628,7 +657,7 @@
     function createWqcTypeCell(rowId, presetValue = '') {
       const td = document.createElement('td');
       td.innerHTML = `
-        <div class="option-group">
+        <div class="option-group vertical">
           <label class="option-gc ${presetValue === 'GC' ? 'selected' : ''}">
             <input type="radio" name="${rowId}-wqctype" value="GC" ${presetValue === 'GC' ? 'checked' : ''}/> G.C.
           </label>
@@ -656,8 +685,6 @@
             notesInput.value = 'Individual 401 WQC authorized for project.';
           } else if (event.target.value === 'NA') {
             notesInput.value = '401 WQC not applicable for this project or ORM action type.';
-          } else if (event.target.value === 'IC') {
-            notesInput.value = 'Individual 401 WQC authorized for project.';
           }
 
           updateRowStatus(rowId);
@@ -683,6 +710,10 @@
 
     function getProjectTypeValue(rowId) {
       return document.getElementById(rowId)?.querySelector('.type-select')?.value || '';
+    }
+
+    function getWqcTypeValue(rowId) {
+      return document.querySelector(`input[name="${rowId}-wqctype"]:checked`)?.value || '';
     }
 
     function calculateDaysInReview(dateString) {
@@ -717,10 +748,6 @@
       const now = new Date();
       now.setHours(0, 0, 0, 0);
       return Math.floor((target.getTime() - now.getTime()) / 86400000);
-    }
-
-    function getWqcTypeValue(rowId) {
-      return document.querySelector(`input[name="${rowId}-wqctype"]:checked`)?.value || '';
     }
 
     function getAnsweredCount(rowId) {
@@ -964,7 +991,7 @@
       row.querySelectorAll(`input[name="${rowId}-wqctype"]`).forEach(input => {
         input.checked = false;
       });
-      row.querySelectorAll('.option-gc, .option-ic').forEach(label => label.classList.remove('selected'));
+      row.querySelectorAll('.option-gc, .option-ic, .option-na').forEach(label => label.classList.remove('selected'));
 
       const typeSelect = row.querySelector('.type-select');
       if (typeSelect) {
@@ -1082,7 +1109,7 @@
         const allAnswered = row.reviewValues.every(v => v !== null);
         const allYes = row.reviewValues.length > 0 && row.reviewValues.every(v => v === 'yes');
         const allNo = row.reviewValues.length > 0 && row.reviewValues.every(v => v === 'no');
-        const complete = row.projectName && row.projectType && allAnswered;
+        const complete = row.projectName && row.projectType && row.wqcType && allAnswered;
         let status = '⚠️ ⚠️';
         if (allYes) status = '👍 💯';
         else if (allNo) status = '👎 🛑';
@@ -1216,3 +1243,5 @@
   </script>
 </body>
 </html>
+
+
