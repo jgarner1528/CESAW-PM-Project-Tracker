@@ -1,0 +1,1258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Project Tracker for PMs | USACE Wilmington District CESAW</title>
+  <style>
+    :root {
+      --text: #102033;
+      --muted: #32465f;
+      --yellow: rgba(234, 221, 165, 0.9); /* tan default incomplete color */
+      --aging-yellow: #FFFF00; /* bright caution yellow for aging warning */
+      --green: rgba(199, 249, 204, 0.84);
+      --red: rgba(248, 180, 180, 0.84);
+      --aging-yellow: #FFFF00; /* bright aging warning yellow */
+      --bright-green: rgba(134, 239, 172, 0.92);
+      --bright-red: rgba(248, 113, 113, 0.92);
+      --orange: #FF8C00; /* true orange for mixed but complete rows */
+      --blue: rgba(219, 234, 254, 0.9);
+      --header-accent: #c62828;
+      --shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background-image: url("BlueRidgeMTNs.jpg");
+      background-repeat: no-repeat;
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      color: var(--text);
+      padding: 24px;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      /* lighter overlay so the Blue Ridge image appears as a watermark */
+      background: rgba(255, 255, 255, 0.18);
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    .wrap {
+      max-width: 2200px;
+      margin: 0 auto;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 18px 22px;
+      margin-bottom: 16px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, rgba(18, 58, 99, 0.84) 0%, rgba(28, 84, 140, 0.72) 100%);
+      backdrop-filter: blur(7px);
+      -webkit-backdrop-filter: blur(7px);
+      box-shadow: var(--shadow);
+      color: white;
+    }
+
+    .header-logo {
+      flex: 0 0 auto;
+      min-width: 160px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .header-logo img {
+      max-height: 88px;
+      width: auto;
+      display: block;
+      filter: drop-shadow(0 4px 10px rgba(0,0,0,0.18));
+    }
+
+    .eyebrow {
+      margin: 0 0 6px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #ffd7d7;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 30px;
+      line-height: 1.15;
+      color: white;
+    }
+
+    .subtitle {
+      margin: 6px 0 0;
+      font-size: 16px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.92);
+    }
+
+    .intro,
+    .empty-note {
+      margin: 0 0 16px;
+      color: #13263f;
+      line-height: 1.55;
+      font-size: 17px;
+      text-shadow: 0 1px 1px rgba(255,255,255,0.15);
+    }
+
+    details.timeline-panel {
+      margin-bottom: 16px;
+      background: rgba(18, 58, 99, 0.2);
+      border-radius: 16px;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      box-shadow: 0 8px 22px rgba(0,0,0,0.12);
+      overflow: hidden;
+    }
+
+    details.timeline-panel > summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 14px 18px;
+      font-weight: 800;
+      color: #102033;
+      background: rgba(255,255,255,0.42);
+    }
+
+    details.timeline-panel > summary::-webkit-details-marker { display: none; }
+
+    .timeline-inner {
+      padding: 14px 18px 16px;
+      background: rgba(255,255,255,0.28);
+    }
+
+    .timeline-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 10px;
+    }
+
+    .timeline-chip {
+      background: rgba(255,255,255,0.46);
+      border-radius: 12px;
+      padding: 10px 12px;
+      box-shadow: 0 5px 14px rgba(0,0,0,0.08);
+      font-size: 17px;
+      line-height: 1.4;
+    }
+
+    .timeline-chip strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+      align-items: center;
+    }
+
+    .controls input[type="text"] {
+      flex: 1 1 280px;
+      min-width: 240px;
+      padding: 12px 14px;
+      border: 1px solid rgba(255,255,255,0.35);
+      border-radius: 12px;
+      font-size: 14px;
+      color: var(--text);
+      background: rgba(255,255,255,0.72);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+    }
+
+    button {
+      padding: 13px 17px;
+      border: 1px solid rgba(255,255,255,0.22);
+      border-radius: 12px;
+      background: rgba(17, 24, 39, 0.88);
+      color: white;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      box-shadow: 0 8px 18px rgba(0,0,0,0.18);
+      transition: transform 0.15s ease, background 0.15s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      background: rgba(17, 24, 39, 0.96);
+    }
+
+    button.secondary { background: rgba(75, 85, 99, 0.88); }
+
+    .table-wrap {
+      overflow: hidden;
+      background: transparent;
+      width: 100%;
+    }
+
+    .table-scale-wrap {
+      width: 100%;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .table-scale-inner {
+      transform-origin: top left;
+      will-change: transform;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      min-width: 2200px;
+      table-layout: auto;
+    }
+
+    th, td {
+      border: 1px solid rgba(255,255,255,0.2);
+      padding: 10px;
+      text-align: center;
+      vertical-align: middle;
+    }
+
+    th {
+      background: rgba(18, 58, 99, 0.78);
+      color: white;
+      font-size: 17px;
+      line-height: 1.3;
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    td {
+      background: rgba(255,255,255,0.22);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      transition: transform 0.12s ease, box-shadow 0.12s ease;
+    }
+
+    tbody tr:hover td {
+      box-shadow: inset 0 0 0 9999px rgba(255,255,255,0.08);
+    }
+
+    th.project-name, td.project-name {
+      min-width: 250px;
+      font-weight: 700;
+    }
+
+    th.project-name {
+      text-align: center;
+    }
+
+    td.project-name {
+      text-align: left;
+    }
+
+    th:nth-child(2), td:nth-child(2) { min-width: 132px; }
+    th:nth-child(3), td:nth-child(3) { min-width: 118px; }
+    th:nth-child(4), td:nth-child(4) { min-width: 132px; }
+    th:nth-child(5), td:nth-child(5) { min-width: 148px; }
+    th:nth-child(6), td:nth-child(6) { min-width: 152px; }
+    th:nth-child(16), td:nth-child(16) { min-width: 110px; max-width: 120px; }
+    th:nth-child(17), td:nth-child(17) { min-width: 110px; }
+    th:nth-child(18), td:nth-child(18), th:nth-child(19), td:nth-child(19) { min-width: 95px; }
+
+    tr.status-yellow td {
+      background: var(--yellow);
+      animation: warningPulse 2.2s ease-in-out infinite;
+    }
+
+    @keyframes warningPulse {
+      0% { box-shadow: inset 0 0 0 0 rgba(255, 193, 7, 0.0); }
+      50% { box-shadow: inset 0 0 0 9999px rgba(255, 193, 7, 0.12); }
+      100% { box-shadow: inset 0 0 0 0 rgba(255, 193, 7, 0.0); }
+    }
+
+    tr.status-green td { background: var(--bright-green); }
+    tr.status-red td { background: var(--bright-red); }
+    tr.status-orange td { background: var(--orange); }
+
+    td.trout-trigger-cell {
+      box-shadow: inset 0 0 0 3px rgba(18, 58, 99, 0.55);
+    }
+
+    .project-name-input,
+    .date-input,
+    .notes-input,
+    .type-select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid rgba(255,255,255,0.35);
+      border-radius: 10px;
+      font-size: 17px;
+      background: rgba(255,255,255,0.78);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+    }
+
+    .type-select {
+      min-width: 125px;
+      font-weight: 700;
+      background: var(--yellow);
+    }
+
+    .type-select.selected { background: var(--green); }
+    .notes-input { min-width: 225px; }
+    .date-input { min-width: 118px; }
+
+    .option-group {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .option-group.vertical {
+      flex-direction: column;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .option-group label {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 17px;
+      font-weight: 700;
+      padding: 6px 8px;
+      border-radius: 10px;
+      background: var(--yellow);
+      min-width: 58px;
+      justify-content: center;
+      transition: background 0.15s ease, transform 0.15s ease;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    .option-group label:hover,
+    .type-select:hover,
+    .notes-input:hover,
+    .date-input:hover,
+    .project-name-input:hover {
+      transform: translateY(-1px);
+    }
+
+    .option-group label.option-yes.selected,
+    .option-group label.option-gc.selected,
+    .option-group label.option-ic.selected,
+    .option-group label.option-na.selected { background: var(--green); }
+    .option-group label.option-no.selected { background: var(--red); }
+
+    .aging-pill,
+    .target-pill,
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 108px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 800;
+      line-height: 1.15;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    .aging-pill {
+      color: #102033;
+      background: rgba(255,255,255,0.72);
+    }
+
+    .aging-fresh { background: rgba(134, 239, 172, 0.9); }
+    .aging-watch { background: var(--aging-yellow); }
+    .aging-old { background: rgba(248, 113, 113, 0.9); color: white; }
+
+    .target-pill { background: rgba(255,255,255,0.74); color: #102033; }
+    .target-good { background: rgba(134, 239, 172, 0.9); }
+    .target-watch { background: var(--aging-yellow); }
+    .target-overdue { background: rgba(248, 113, 113, 0.9); color: white; }
+
+    .progress-wrap {
+      width: 100%;
+      min-width: 110px;
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 26px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.55);
+      overflow: hidden;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.12);
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, rgba(59,130,246,0.85), rgba(16,185,129,0.85));
+      transition: width 0.2s ease;
+    }
+
+    .progress-label {
+      margin-top: 5px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #13263f;
+      text-align: center;
+    }
+
+    .row-actions {
+      white-space: nowrap;
+      text-align: center;
+    }
+
+    .row-actions button { min-width: 68px; }
+
+    .pill {
+      background: var(--blue);
+      color: #1e3a8a;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 20px;
+      margin-bottom: 12px;
+      padding: 16px 18px;
+      border-top: 2px solid rgba(255,255,255,0.35);
+      border-radius: 18px;
+      background: rgba(255,255,255,0.18);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.10);
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      font-size: 17px;
+      color: #13263f;
+      font-weight: 600;
+      background: rgba(255,255,255,0.36);
+      padding: 8px 12px;
+      border-radius: 999px;
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+    }
+
+    .swatch {
+      width: 26px;
+      height: 22px;
+      border-radius: 4px;
+      border: 1px solid rgba(0,0,0,0.1);
+      flex: 0 0 auto;
+    }
+
+    .yellow { background: var(--yellow); }
+    .aging-yellow { background: var(--aging-yellow); }
+    .green { background: var(--green); }
+    .red { background: var(--red); }
+    .bright-green { background: var(--bright-green); }
+    .bright-red { background: var(--bright-red); }
+    .orange { background: var(--orange); }
+
+    @media (max-width: 900px) {
+      .header { flex-direction: column; align-items: flex-start; }
+      .header-logo { min-width: 0; }
+      .header-logo img { max-height: 72px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <div class="header">
+        <div class="header-logo">
+          <img src="WDlogo.png" alt="USACE Wilmington District CESAW logo" />
+        </div>
+        <div>
+          <p class="eyebrow">USACE Regulatory Workflow</p>
+          <h1>Project Tracker for PMs</h1>
+          <p class="subtitle">USACE Wilmington District CESAW</p>
+        </div>
+      </div>
+
+      <p class="intro">Track each project by entering a start date, selecting a project type, and marking the review items as Yes or No. The dashboard auto-calculates days in review, target decision dates, and progress percentages. Status shows ⚠️ ⚠️ for incomplete rows, 👍 💯 for fully completed rows whether all yes or mixed, and 👎 🛑 when all responses are no.</p>
+
+      <details class="timeline-panel">
+        <summary>Show typical regulatory timelines reference</summary>
+        <div class="timeline-inner">
+          <div class="timeline-grid">
+            <div class="timeline-chip"><strong>PCN, Pre-Construction Notification</strong> 45 day Corps review window after receipt of a complete PCN.</div>
+            <div class="timeline-chip"><strong>NWP, Nationwide Permit</strong> Often immediate if no PCN is required, 45 days when a PCN is required.</div>
+            <div class="timeline-chip"><strong>UA, Unauthorized Action</strong> No single definitive timeline, depends on enforcement posture, restoration needs, and submittal completeness.</div>
+            <div class="timeline-chip"><strong>IP, Individual Permit</strong> Common tracking goal is about 120 days once the application is complete and the review process is underway.</div>
+            <div class="timeline-chip"><strong>SIP, Standard Individual Permit</strong> Similar to IP, commonly tracked at about 120 days for workload management.</div>
+            <div class="timeline-chip"><strong>Permit Mod, Permit Modification</strong> Often tracked around 45 days, but can vary with the scope of the requested change.</div>
+            <div class="timeline-chip"><strong>DC, Delineation Concurrence</strong> Common tracking window is same day to about 30 days, depending on submittal quality and review needs.</div>
+            <div class="timeline-chip"><strong>AJD, Approved Jurisdictional Determination</strong> Common Wilmington-style tracking goal is about 60 days.</div>
+            <div class="timeline-chip"><strong>PJD, Preliminary Jurisdictional Determination</strong> Often same day to about 30 days if the request package is sufficient.</div>
+            <div class="timeline-chip"><strong>PREAPPCONS, Pre-Application Consultation</strong> Common planning and coordination target is about 30 days.</div>
+            <div class="timeline-chip"><strong>NPR, No Permit Required</strong> Often same day to up to 30 days depending on jurisdictional review and project information.</div>
+            <div class="timeline-chip"><strong>PGP, Programmatic General Permit</strong> Common tracker value is about 45 days, though actual timing depends on the partner program and completeness.</div>
+            <div class="timeline-chip"><strong>RGP, Regional General Permit</strong> Common tracker value is about 60 days, used as an expedited regional general permit review benchmark.</div>
+            <div class="timeline-chip"><strong>LOP, Letter of Permission</strong> Common abbreviated review track is about 60 to 90 days, this tracker uses 90 days.</div>
+          </div>
+        </div>
+      </details>
+
+      <div class="controls">
+        <input id="projectInput" type="text" placeholder="Enter project name" />
+        <button id="addProjectBtn">Add Project</button>
+        <button id="addSampleBtn" class="secondary">Add Sample Rows</button>
+        <button id="showAllBtn" class="secondary">Show All</button>
+        <button id="showIncompleteBtn" class="secondary">Show Incomplete Only</button>
+        <button id="exportCsvBtn">Export CSV</button>
+      </div>
+
+      <div class="table-wrap">
+        <div class="table-scale-wrap" id="tableScaleWrap">
+          <div class="table-scale-inner" id="tableScaleInner">
+            <table id="projectTable">
+          <thead>
+            <tr>
+              <th class="project-name" data-sort="text">Project Name</th>
+              <th data-sort="date">Start Date</th>
+              <th data-sort="aging">Days in Review</th>
+              <th data-sort="date">Target Date</th>
+              <th data-sort="progress">Progress</th>
+              <th data-sort="type">Project Type</th>
+              <th data-sort="yn">Administrative Record Initiated</th>
+              <th data-sort="yn">ORM Action Initiated</th>
+              <th data-sort="yn">Completeness Determination</th>
+              <th data-sort="yn">Evaluation Checklist</th>
+              <th data-sort="yn">Trout Waters / NC HQW</th>
+              <th data-sort="yn">401 WQC</th>
+              <th>401 WQC Type</th>
+              <th data-sort="yn">Section 7 ESA</th>
+              <th data-sort="yn">Section 106 NHPA</th>
+              <th data-sort="yn">THPO / Tribal</th>
+              <th data-sort="text">Notes</th>
+              <th data-sort="status">Status</th>
+              <th>Reset</th>
+              <th>Delete</th>
+            </tr>
+          </thead>
+          <tbody id="projectTableBody"></tbody>
+        </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="legend" style="flex-direction:column;align-items:flex-start;gap:14px;">
+        <div style="font-weight:700;font-size:15px;margin-bottom:2px;">Project Time Clock Colors</div>
+        <div style="display:flex;flex-wrap:wrap;gap:10px;">
+          <div class="legend-item"><span class="swatch green"></span> Aging green = under threshold</div>
+          <div class="legend-item"><span class="swatch aging-yellow"></span> Aging yellow = approaching threshold</div>
+          <div class="legend-item"><span class="swatch bright-red"></span> Aging red = overdue</div>
+        </div>
+
+        <div style="font-weight:700;font-size:15px;margin-top:6px;">Project Row Identifying Colors</div>
+        <div style="display:flex;flex-wrap:wrap;gap:10px;">
+          <div class="legend-item"><span class="swatch yellow"></span> Yellow row = ⚠️ ⚠️ incomplete</div>
+          <div class="legend-item"><span class="swatch bright-green"></span> Bright green row = 👍 💯 all yes</div>
+          <div class="legend-item"><span class="swatch" style="background: var(--orange);"></span> Orange row = 👍 💯 mixed but complete</div>
+          <div class="legend-item"><span class="swatch bright-red"></span> Bright red row = 👎 🛑 all no</div>
+        </div>
+      </div>
+
+      <div class="empty-note">Place <strong>WDlogo.png</strong> and <strong>BlueRidgeMTNs.jpg</strong> in the same folder as this HTML file. This tracker auto-saves in your browser, supports sorting by clicking column headers, can filter incomplete rows, and exports to CSV.</div>
+    </div>
+  </div>
+
+  <script>
+    const projectInput = document.getElementById('projectInput');
+    const addProjectBtn = document.getElementById('addProjectBtn');
+    const addSampleBtn = document.getElementById('addSampleBtn');
+    const showAllBtn = document.getElementById('showAllBtn');
+    const showIncompleteBtn = document.getElementById('showIncompleteBtn');
+    const exportCsvBtn = document.getElementById('exportCsvBtn');
+    const projectTableBody = document.getElementById('projectTableBody');
+    const projectTable = document.getElementById('projectTable');
+    const tableScaleWrap = document.getElementById('tableScaleWrap');
+    const tableScaleInner = document.getElementById('tableScaleInner');
+    const tableHeaders = document.querySelectorAll('#projectTable thead th[data-sort]');
+
+    let rowCount = 0;
+    const reviewColumnCount = 9;
+    const totalTrackedSelections = 10;
+    const storageKey = 'usace_project_tracker_rows_v3';
+    const projectTypeOptions = ['PCN', 'NWP', 'UA', 'IP', 'SIP', 'Permit Mod', 'DC', 'AJD', 'PJD', 'PREAPPCONS', 'NPR', 'PGP', 'RGP', 'LOP'];
+    let currentFilter = 'all';
+    let sortDirection = {};
+
+    const timelineRules = {
+      'PCN': 45,
+      'NWP': 45,
+      'UA': null,
+      'IP': 120,
+      'SIP': 120,
+      'Permit Mod': 45,
+      'DC': 30,
+      'AJD': 60,
+      'PJD': 30,
+      'PREAPPCONS': 30,
+      'NPR': 30,
+      'PGP': 45,
+      'RGP': 60,
+      'LOP': 90
+    };
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;');
+    }
+
+    function createYesNoCell(rowId, itemIndex, presetValue = '') {
+      const td = document.createElement('td');
+      td.dataset.itemIndex = String(itemIndex);
+      td.innerHTML = `
+        <div class="option-group vertical">
+          <label class="option-yes">
+            <input type="radio" name="${rowId}-item-${itemIndex}" value="yes" ${presetValue === 'yes' ? 'checked' : ''}/> Yes
+          </label>
+          <label class="option-no">
+            <input type="radio" name="${rowId}-item-${itemIndex}" value="no" ${presetValue === 'no' ? 'checked' : ''}/> No
+          </label>
+        </div>
+      `;
+
+      td.querySelectorAll('input').forEach(input => {
+        input.addEventListener('change', () => {
+          updateRowStatus(rowId);
+          persistRows();
+        });
+      });
+
+      return td;
+    }
+
+    function createWqcTypeCell(rowId, presetValue = '') {
+      const td = document.createElement('td');
+      td.innerHTML = `
+        <div class="option-group">
+          <label class="option-gc ${presetValue === 'GC' ? 'selected' : ''}">
+            <input type="radio" name="${rowId}-wqctype" value="GC" ${presetValue === 'GC' ? 'checked' : ''}/> G.C.
+          </label>
+          <label class="option-ic ${presetValue === 'IC' ? 'selected' : ''}">
+            <input type="radio" name="${rowId}-wqctype" value="IC" ${presetValue === 'IC' ? 'checked' : ''}/> I.C.
+          </label>
+          <label class="option-na ${presetValue === 'NA' ? 'selected' : ''}">
+            <input type="radio" name="${rowId}-wqctype" value="NA" ${presetValue === 'NA' ? 'checked' : ''}/> N/A
+          </label>
+        </div>
+      `;
+
+      td.querySelectorAll('input').forEach(input => {
+        input.addEventListener('change', event => {
+          const row = document.getElementById(rowId);
+          const notesInput = row.querySelector('.notes-input');
+          const labels = td.querySelectorAll('label');
+          labels.forEach(label => label.classList.remove('selected'));
+          const label = event.target.closest('label');
+          if (label) label.classList.add('selected');
+
+          if (event.target.value === 'GC') {
+            notesInput.value = 'General 401 WQC authorized for project.';
+          } else if (event.target.value === 'IC') {
+            notesInput.value = 'Individual 401 WQC authorized for project.';
+          } else if (event.target.value === 'NA') {
+            notesInput.value = '401 WQC not applicable for this project or ORM action type.';
+          } else if (event.target.value === 'IC') {
+            notesInput.value = 'Individual 401 WQC authorized for project.';
+          }
+
+          updateRowStatus(rowId);
+          persistRows();
+        });
+      });
+
+      return td;
+    }
+
+    function getRowValues(rowId) {
+      const values = [];
+      for (let i = 1; i <= reviewColumnCount; i++) {
+        const checked = document.querySelector(`input[name="${rowId}-item-${i}"]:checked`);
+        values.push(checked ? checked.value : null);
+      }
+      return values;
+    }
+
+    function getStartDateValue(rowId) {
+      return document.getElementById(rowId)?.querySelector('.date-input')?.value || '';
+    }
+
+    function getProjectTypeValue(rowId) {
+      return document.getElementById(rowId)?.querySelector('.type-select')?.value || '';
+    }
+
+    function calculateDaysInReview(dateString) {
+      if (!dateString) return null;
+      const start = new Date(dateString + 'T00:00:00');
+      if (Number.isNaN(start.getTime())) return null;
+      const now = new Date();
+      now.setHours(0, 0, 0, 0);
+      const diffMs = now.getTime() - start.getTime();
+      return Math.max(0, Math.floor(diffMs / 86400000));
+    }
+
+    function addDays(dateString, daysToAdd) {
+      if (!dateString || !daysToAdd) return '';
+      const date = new Date(dateString + 'T00:00:00');
+      if (Number.isNaN(date.getTime())) return '';
+      date.setDate(date.getDate() + daysToAdd);
+      return date.toISOString().slice(0, 10);
+    }
+
+    function formatDateForDisplay(dateString) {
+      if (!dateString) return 'No target';
+      const date = new Date(dateString + 'T00:00:00');
+      if (Number.isNaN(date.getTime())) return 'No target';
+      return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+
+    function daysUntil(dateString) {
+      if (!dateString) return null;
+      const target = new Date(dateString + 'T00:00:00');
+      if (Number.isNaN(target.getTime())) return null;
+      const now = new Date();
+      now.setHours(0, 0, 0, 0);
+      return Math.floor((target.getTime() - now.getTime()) / 86400000);
+    }
+
+    function getWqcTypeValue(rowId) {
+      return document.querySelector(`input[name="${rowId}-wqctype"]:checked`)?.value || '';
+    }
+
+    function getAnsweredCount(rowId) {
+      const reviewAnswered = getRowValues(rowId).filter(v => v !== null).length;
+      const wqcAnswered = getWqcTypeValue(rowId) ? 1 : 0;
+      return reviewAnswered + wqcAnswered;
+    }
+
+    function updateProjectTypeColor(rowId) {
+      const row = document.getElementById(rowId);
+      const typeSelect = row.querySelector('.type-select');
+      if (!typeSelect) return;
+      if (typeSelect.value) typeSelect.classList.add('selected');
+      else typeSelect.classList.remove('selected');
+    }
+
+    function updateTroutTrigger(rowId) {
+      const row = document.getElementById(rowId);
+      const troutYes = row.querySelector(`input[name="${rowId}-item-5"][value="yes"]`)?.checked;
+      const projectType = getProjectTypeValue(rowId);
+      const trigger = troutYes && (projectType === 'PCN' || projectType === 'NWP');
+      const troutCell = row.querySelector('td[data-item-index="5"]');
+      if (troutCell) {
+        troutCell.classList.toggle('trout-trigger-cell', !!trigger);
+        troutCell.title = trigger ? 'Trout Waters trigger: review NC trout waters / PCN implications.' : '';
+      }
+    }
+
+    function updateIndividualCellColors(rowId) {
+      const row = document.getElementById(rowId);
+      for (let i = 1; i <= reviewColumnCount; i++) {
+        const yesInput = row.querySelector(`input[name="${rowId}-item-${i}"][value="yes"]`);
+        const noInput = row.querySelector(`input[name="${rowId}-item-${i}"][value="no"]`);
+        const yesLabel = yesInput ? yesInput.closest('label') : null;
+        const noLabel = noInput ? noInput.closest('label') : null;
+        if (yesLabel) yesLabel.classList.toggle('selected', !!yesInput?.checked);
+        if (noLabel) noLabel.classList.toggle('selected', !!noInput?.checked);
+      }
+
+      const gcInput = row.querySelector(`input[name="${rowId}-wqctype"][value="GC"]`);
+      const icInput = row.querySelector(`input[name="${rowId}-wqctype"][value="IC"]`);
+      const naInput = row.querySelector(`input[name="${rowId}-wqctype"][value="NA"]`);
+      const gcLabel = gcInput ? gcInput.closest('label') : null;
+      const icLabel = icInput ? icInput.closest('label') : null;
+      const naLabel = naInput ? naInput.closest('label') : null;
+      if (gcLabel) gcLabel.classList.toggle('selected', !!gcInput?.checked);
+      if (icLabel) icLabel.classList.toggle('selected', !!icInput?.checked);
+      if (naLabel) naLabel.classList.toggle('selected', !!naInput?.checked);
+    }
+
+    function getTimelineDays(projectType) {
+      return timelineRules[projectType] || null;
+    }
+
+    function updateAgingAndProgress(rowId) {
+      const row = document.getElementById(rowId);
+      const startDate = getStartDateValue(rowId);
+      const projectType = getProjectTypeValue(rowId);
+      const timelineDays = getTimelineDays(projectType);
+      const days = calculateDaysInReview(startDate);
+      const targetDate = addDays(startDate, timelineDays);
+      const untilTarget = daysUntil(targetDate);
+      const agingPill = row.querySelector('.aging-pill');
+      const targetPill = row.querySelector('.target-pill');
+      const progressFill = row.querySelector('.progress-fill');
+      const progressLabel = row.querySelector('.progress-label');
+      const answered = getAnsweredCount(rowId);
+      const percent = Math.round((answered / totalTrackedSelections) * 100);
+
+      if (agingPill) {
+        agingPill.classList.remove('aging-fresh', 'aging-watch', 'aging-old');
+
+        if (days === null) {
+          agingPill.textContent = 'No date';
+        } else {
+          agingPill.textContent = `${days} days`;
+          if (timelineDays === null) {
+            // No fixed review clock, such as UA
+          } else if (days < timelineDays) {
+            agingPill.classList.add('aging-fresh');
+          } else if (days <= timelineDays + 15) {
+            agingPill.classList.add('aging-watch');
+          } else {
+            agingPill.classList.add('aging-old');
+          }
+        }
+      }
+
+      if (targetPill) {
+        targetPill.classList.remove('target-good', 'target-watch', 'target-overdue');
+        targetPill.textContent = formatDateForDisplay(targetDate);
+
+        if (timelineDays !== null && targetDate) {
+          if (untilTarget !== null && untilTarget >= 10) targetPill.classList.add('target-good');
+          else if (untilTarget !== null && untilTarget >= 0) targetPill.classList.add('target-watch');
+          else targetPill.classList.add('target-overdue');
+        }
+      }
+
+      if (progressFill) progressFill.style.width = `${percent}%`;
+      if (progressLabel) progressLabel.textContent = `${percent}% complete`;
+    }
+
+    function getRowStatusLabel(rowId) {
+      const values = getRowValues(rowId);
+      const row = document.getElementById(rowId);
+      const typeSelected = !!row?.querySelector('.type-select')?.value;
+      const nameFilled = !!row?.querySelector('.project-name-input')?.value.trim();
+      const allAnswered = values.every(v => v !== null);
+      const wqcTypeSelected = !!getWqcTypeValue(rowId);
+      const allYes = values.length > 0 && values.every(v => v === 'yes');
+      const allNo = values.length > 0 && values.every(v => v === 'no');
+      const allFieldsFilled = nameFilled && typeSelected && wqcTypeSelected && allAnswered;
+
+      if (allYes) return '👍 💯';
+      if (allNo) return '👎 🛑';
+      if (allFieldsFilled) return '👍 💯';
+      return '⚠️ ⚠️';
+    }
+
+    function updateRowStatus(rowId) {
+      const row = document.getElementById(rowId);
+      const statusCell = row.querySelector('.status-pill');
+      const values = getRowValues(rowId);
+      const typeSelected = !!row.querySelector('.type-select')?.value;
+      const nameFilled = !!row.querySelector('.project-name-input')?.value.trim();
+
+      updateIndividualCellColors(rowId);
+      updateProjectTypeColor(rowId);
+      updateTroutTrigger(rowId);
+      updateAgingAndProgress(rowId);
+      row.classList.remove('status-yellow', 'status-green', 'status-red', 'status-orange');
+
+      const allAnswered = values.every(v => v !== null);
+      const wqcTypeSelected = !!getWqcTypeValue(rowId);
+      const allYes = values.length > 0 && values.every(v => v === 'yes');
+      const allNo = values.length > 0 && values.every(v => v === 'no');
+      const allFieldsFilled = nameFilled && typeSelected && wqcTypeSelected && allAnswered;
+
+      if (allYes) {
+        row.classList.add('status-green');
+        statusCell.textContent = '👍 💯';
+      } else if (allNo) {
+        row.classList.add('status-red');
+        statusCell.textContent = '👎 🛑';
+      } else if (allFieldsFilled) {
+        row.classList.add('status-orange');
+        statusCell.textContent = '👍 💯';
+      } else {
+        row.classList.add('status-yellow');
+        statusCell.textContent = '⚠️ ⚠️';
+      }
+
+      applyCurrentFilter();
+    }
+
+    function addProjectRow(projectName = '', savedData = null) {
+      rowCount += 1;
+      const rowId = `project-row-${rowCount}`;
+      const tr = document.createElement('tr');
+      tr.id = rowId;
+      tr.className = 'status-yellow';
+
+      const projectTd = document.createElement('td');
+      projectTd.className = 'project-name';
+      projectTd.innerHTML = `<input type="text" class="project-name-input" value="${escapeHtml(savedData?.projectName || projectName)}" placeholder="Project name" />`;
+      projectTd.querySelector('input').addEventListener('input', () => {
+        updateRowStatus(rowId);
+        persistRows();
+      });
+      tr.appendChild(projectTd);
+
+      const startDateTd = document.createElement('td');
+      startDateTd.innerHTML = `<input type="date" class="date-input" value="${escapeHtml(savedData?.startDate || '')}" />`;
+      startDateTd.querySelector('input').addEventListener('input', () => {
+        updateRowStatus(rowId);
+        persistRows();
+      });
+      tr.appendChild(startDateTd);
+
+      const agingTd = document.createElement('td');
+      agingTd.innerHTML = '<span class="aging-pill">No date</span>';
+      tr.appendChild(agingTd);
+
+      const targetTd = document.createElement('td');
+      targetTd.innerHTML = '<span class="target-pill">No target</span>';
+      tr.appendChild(targetTd);
+
+      const progressTd = document.createElement('td');
+      progressTd.innerHTML = '<div class="progress-wrap"><div class="progress-track"><div class="progress-fill"></div></div><div class="progress-label">0% complete</div></div>';
+      tr.appendChild(progressTd);
+
+      const typeTd = document.createElement('td');
+      const optionsHtml = ['<option value="">Select type</option>']
+        .concat(projectTypeOptions.map(option => `<option value="${option}" ${savedData?.projectType === option ? 'selected' : ''}>${option}</option>`))
+        .join('');
+      typeTd.innerHTML = `<select class="type-select">${optionsHtml}</select>`;
+      typeTd.querySelector('select').addEventListener('change', () => {
+        updateRowStatus(rowId);
+        persistRows();
+      });
+      tr.appendChild(typeTd);
+
+      const savedValues = savedData?.reviewValues || [];
+      const savedWqcType = savedData?.wqcType || '';
+
+      for (let i = 1; i <= reviewColumnCount; i++) {
+        tr.appendChild(createYesNoCell(rowId, i, savedValues[i - 1] || ''));
+        if (i === 6) {
+          tr.appendChild(createWqcTypeCell(rowId, savedWqcType));
+        }
+      }
+
+      const notesTd = document.createElement('td');
+      notesTd.innerHTML = `<input type="text" class="notes-input" value="${escapeHtml(savedData?.notes || '')}" placeholder="Add notes for this project" />`;
+      notesTd.querySelector('input').addEventListener('input', () => {
+        updateRowStatus(rowId);
+        persistRows();
+      });
+      tr.appendChild(notesTd);
+
+      const statusTd = document.createElement('td');
+      statusTd.innerHTML = '<span class="pill status-pill">⚠️ ⚠️</span>';
+      tr.appendChild(statusTd);
+
+      const resetTd = document.createElement('td');
+      resetTd.className = 'row-actions';
+      resetTd.innerHTML = '<button type="button" class="secondary">Reset</button>';
+      resetTd.querySelector('button').addEventListener('click', () => clearRow(rowId));
+      tr.appendChild(resetTd);
+
+      const deleteTd = document.createElement('td');
+      deleteTd.className = 'row-actions';
+      deleteTd.innerHTML = '<button type="button">Delete</button>';
+      deleteTd.querySelector('button').addEventListener('click', () => deleteRow(rowId));
+      tr.appendChild(deleteTd);
+
+      projectTableBody.appendChild(tr);
+      updateRowStatus(rowId);
+      return tr;
+    }
+
+    function clearRow(rowId) {
+      const row = document.getElementById(rowId);
+      row.querySelectorAll(`input[name^="${rowId}-item-"]`).forEach(input => {
+        input.checked = false;
+      });
+      row.querySelectorAll(`input[name="${rowId}-wqctype"]`).forEach(input => {
+        input.checked = false;
+      });
+      row.querySelectorAll('.option-gc, .option-ic').forEach(label => label.classList.remove('selected'));
+
+      const typeSelect = row.querySelector('.type-select');
+      if (typeSelect) {
+        typeSelect.value = '';
+        typeSelect.classList.remove('selected');
+      }
+
+      const notesInput = row.querySelector('.notes-input');
+      if (notesInput) notesInput.value = '';
+      const dateInput = row.querySelector('.date-input');
+      if (dateInput) dateInput.value = '';
+      const nameInput = row.querySelector('.project-name-input');
+      if (nameInput) nameInput.value = '';
+
+      updateRowStatus(rowId);
+      persistRows();
+    }
+
+    function deleteRow(rowId) {
+      const row = document.getElementById(rowId);
+      if (row) {
+        row.remove();
+        persistRows();
+      }
+    }
+
+    function collectRows() {
+      return Array.from(projectTableBody.querySelectorAll('tr')).map(row => {
+        const rowId = row.id;
+        const wqcType = row.querySelector(`input[name="${rowId}-wqctype"]:checked`)?.value || '';
+        return {
+          projectName: row.querySelector('.project-name-input')?.value || '',
+          startDate: row.querySelector('.date-input')?.value || '',
+          projectType: row.querySelector('.type-select')?.value || '',
+          reviewValues: getRowValues(rowId),
+          wqcType,
+          notes: row.querySelector('.notes-input')?.value || ''
+        };
+      });
+    }
+
+    function persistRows() {
+      localStorage.setItem(storageKey, JSON.stringify(collectRows()));
+      queueTableScale();
+    }
+
+    function loadRows() {
+      const saved = localStorage.getItem(storageKey);
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length) {
+            projectTableBody.innerHTML = '';
+            rowCount = 0;
+            parsed.forEach(row => addProjectRow('', row));
+            return;
+          }
+        } catch (error) {
+          console.error('Could not load saved project data.', error);
+        }
+      }
+
+      for (let i = 1; i <= 30; i++) {
+        addProjectRow(`Project ${i}`);
+      }
+      persistRows();
+    }
+
+    function applyCurrentFilter() {
+      const rows = Array.from(projectTableBody.querySelectorAll('tr'));
+      rows.forEach(row => {
+        const status = row.querySelector('.status-pill')?.textContent || '';
+        const show = currentFilter === 'all' || status === '⚠️ ⚠️';
+        row.style.display = show ? '' : 'none';
+      });
+      queueTableScale();
+    }
+
+    function updateTableScale() {
+      if (!projectTable || !tableScaleWrap || !tableScaleInner) return;
+      tableScaleInner.style.transform = 'scale(1)';
+      tableScaleWrap.style.height = 'auto';
+      const naturalWidth = projectTable.scrollWidth;
+      const naturalHeight = projectTable.scrollHeight;
+      const availableWidth = tableScaleWrap.clientWidth;
+      if (!naturalWidth || !availableWidth) return;
+      const scale = Math.min(1, availableWidth / naturalWidth);
+      tableScaleInner.style.transform = `scale(${scale})`;
+      tableScaleWrap.style.height = `${naturalHeight * scale}px`;
+    }
+
+    let tableScaleQueued = false;
+    function queueTableScale() {
+      if (tableScaleQueued) return;
+      tableScaleQueued = true;
+      requestAnimationFrame(() => {
+        tableScaleQueued = false;
+        updateTableScale();
+      });
+    }
+
+    function exportToCsv() {
+      const headers = [
+        'Project Name', 'Start Date', 'Days in Review', 'Target Date', 'Progress', 'Project Type',
+        'Administrative Record Initiated', 'ORM Action Initiated', 'Completeness Determination',
+        'Evaluation Checklist', 'Trout Waters / NC HQW', '401 WQC', '401 WQC Type', 'Section 7 ESA',
+        'Section 106 NHPA', 'THPO / Tribal', 'Notes', 'Status'
+      ];
+
+      const rows = collectRows().map(row => {
+        const days = calculateDaysInReview(row.startDate);
+        const targetDate = addDays(row.startDate, getTimelineDays(row.projectType));
+        const trackedCount = row.reviewValues.filter(v => v !== null).length + (row.wqcType ? 1 : 0);
+        const progress = `${Math.round((trackedCount / totalTrackedSelections) * 100)}%`;
+        const allAnswered = row.reviewValues.every(v => v !== null);
+        const allYes = row.reviewValues.length > 0 && row.reviewValues.every(v => v === 'yes');
+        const allNo = row.reviewValues.length > 0 && row.reviewValues.every(v => v === 'no');
+        const complete = row.projectName && row.projectType && allAnswered;
+        let status = '⚠️ ⚠️';
+        if (allYes) status = '👍 💯';
+        else if (allNo) status = '👎 🛑';
+        else if (complete) status = '👍 💯';
+
+        return [
+          row.projectName,
+          row.startDate,
+          days ?? '',
+          targetDate,
+          progress,
+          row.projectType,
+          ...row.reviewValues.slice(0, 6),
+          row.wqcType,
+          ...row.reviewValues.slice(6),
+          row.notes,
+          status
+        ];
+      });
+
+      const csv = [headers, ...rows]
+        .map(row => row.map(value => `"${String(value ?? '').replaceAll('"', '""')}"`).join(','))
+        .join('\n');
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      link.href = url;
+      link.download = 'USACE_Project_Tracker.csv';
+      link.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function getCellSortValue(row, colIndex, sortType) {
+      if (sortType === 'text') {
+        const input = row.cells[colIndex].querySelector('input');
+        return (input ? input.value : row.cells[colIndex].textContent).toLowerCase();
+      }
+      if (sortType === 'date') {
+        const input = row.cells[colIndex].querySelector('input');
+        return input ? input.value : row.cells[colIndex].textContent.trim();
+      }
+      if (sortType === 'aging') {
+        const match = row.cells[colIndex].textContent.trim().match(/\d+/);
+        return match ? Number(match[0]) : -1;
+      }
+      if (sortType === 'progress') {
+        const match = row.cells[colIndex].textContent.trim().match(/\d+/);
+        return match ? Number(match[0]) : 0;
+      }
+      if (sortType === 'type') {
+        return (row.cells[colIndex].querySelector('select')?.value || '').toLowerCase();
+      }
+      if (sortType === 'yn') {
+        const yes = row.cells[colIndex].querySelector('input[value="yes"]')?.checked;
+        const no = row.cells[colIndex].querySelector('input[value="no"]')?.checked;
+        if (yes) return 2;
+        if (no) return 1;
+        return 0;
+      }
+      if (sortType === 'status') {
+        const value = row.cells[colIndex].textContent.trim();
+        const order = { '⚠️ ⚠️': 0, '👍 💯': 1, '👎 🛑': 2 };
+        return order[value] ?? 0;
+      }
+      return row.cells[colIndex].textContent.trim().toLowerCase();
+    }
+
+    function sortTableByColumn(colIndex, sortType) {
+      const rows = Array.from(projectTableBody.querySelectorAll('tr'));
+      const direction = sortDirection[colIndex] === 'asc' ? 'desc' : 'asc';
+      sortDirection[colIndex] = direction;
+
+      rows.sort((a, b) => {
+        const aVal = getCellSortValue(a, colIndex, sortType);
+        const bVal = getCellSortValue(b, colIndex, sortType);
+        if (aVal < bVal) return direction === 'asc' ? -1 : 1;
+        if (aVal > bVal) return direction === 'asc' ? 1 : -1;
+        return 0;
+      });
+
+      rows.forEach(row => projectTableBody.appendChild(row));
+      applyCurrentFilter();
+      persistRows();
+    }
+
+    addProjectBtn.addEventListener('click', () => {
+      const name = projectInput.value.trim();
+      addProjectRow(name);
+      projectInput.value = '';
+      projectInput.focus();
+      persistRows();
+    });
+
+    projectInput.addEventListener('keydown', event => {
+      if (event.key === 'Enter') addProjectBtn.click();
+    });
+
+    addSampleBtn.addEventListener('click', () => {
+      [
+        { name: 'Project Alpha', type: 'PCN' },
+        { name: 'Project Bravo', type: 'AJD' },
+        { name: 'Project Charlie', type: 'IP' }
+      ].forEach(item => addProjectRow(item.name, { projectName: item.name, projectType: item.type, startDate: '', reviewValues: [], wqcType: '', notes: '' }));
+      persistRows();
+    });
+
+    showAllBtn.addEventListener('click', () => {
+      currentFilter = 'all';
+      applyCurrentFilter();
+    });
+
+    showIncompleteBtn.addEventListener('click', () => {
+      currentFilter = 'incomplete';
+      applyCurrentFilter();
+    });
+
+    exportCsvBtn.addEventListener('click', exportToCsv);
+
+    tableHeaders.forEach((header, index) => {
+      header.style.cursor = 'pointer';
+      header.title = 'Click to sort';
+      header.addEventListener('click', () => sortTableByColumn(index, header.dataset.sort));
+    });
+
+    window.addEventListener('load', () => {
+      loadRows();
+      queueTableScale();
+    });
+    window.addEventListener('resize', queueTableScale);
+  </script>
+</body>
+</html>
+
